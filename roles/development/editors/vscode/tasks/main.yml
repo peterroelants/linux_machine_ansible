@@ -1,0 +1,16 @@
+---
+# Setup depencencies
+- name: Enable snap
+  become: yes
+  apt:
+    pkg: snapd
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600  # One hour
+
+# Install with snap
+# https://code.visualstudio.com/docs/setup/linux#_snap
+- name: Install VS Code
+  community.general.snap:
+    name: code
+    classic: yes

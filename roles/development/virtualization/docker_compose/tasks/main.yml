@@ -1,0 +1,15 @@
+---
+# https://docs.docker.com/compose/install/
+# https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04
+- name: Install Docker Compose
+  become: yes
+  get_url:
+    url: "{{ docker_compose_url }}"
+    dest: "{{ docker_compose_path }}"
+    mode: "a+x"
+    force: yes  # Update if already exists
+
+- shell: "docker-compose --version"
+  register: docker_compose_version
+- debug:
+    msg: "docker-compose version is {{ docker_compose_version.stdout }}"

@@ -1,0 +1,29 @@
+---
+# https://www.spotify.com/us/download/linux/
+- name: apt update
+  become: yes
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600  # One hour
+
+- name: Setup Spotify repository and install
+  block:
+  - name: Add Spotify key
+    become: yes
+    apt_key: 
+      url: "{{ spotify_sign_key }}"
+      state: present
+
+  - name: Add Spotify repo
+    become: yes
+    apt_repository:
+      repo: "deb {{ spotify_repo_url }} stable non-free"
+      filename: spotify
+      state: present
+
+  - name: Install Spotify
+    become: yes
+    apt: 
+      name: spotify-client
+      state: latest
+      update_cache: yes

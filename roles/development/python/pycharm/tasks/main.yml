@@ -1,0 +1,17 @@
+---
+# Setup depencencies
+- name: Enable snap
+  become: yes
+  apt:
+    pkg: snapd
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600  # One hour
+
+# Install with snap
+# https://www.jetbrains.com/help/pycharm/installation-guide.html#snap-install
+- name: Install PyCharm
+  become: yes
+  community.general.snap:
+    name: pycharm-community
+    classic: yes

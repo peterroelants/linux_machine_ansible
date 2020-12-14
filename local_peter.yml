@@ -1,0 +1,35 @@
+- hosts: my_machine
+  gather_facts: yes
+
+  pre_tasks:
+    - debug:
+        msg: "Running playbook as user={{ ansible_user_id }}"
+
+  roles:
+    - role: common/upgrade
+    - role: common/tools
+    - role: common/restricted
+    - role: development/ssh
+    - role: development/python/system
+    - role: development/ruby
+    - role: development/editors/neovim
+    - role: development/fonts
+    - role: development/shell/zsh
+    - role: gnome
+    - role: browsers/chrome
+    - role: apps/gimp
+    - role: apps/spotify
+    - role: apps/vlc
+    - role: apps/eid_belgium
+    - role: development/editors/vscode
+    - role: development/python/pycharm
+    - role: development/python/anaconda
+      conda_path: ~/miniconda3/
+    - role: development/virtualization/docker
+    - role: development/virtualization/docker_compose
+    - role: drivers/nvidia
+    - role: config
+
+  post_tasks:
+    - debug:
+        msg: "Reboot to finish"

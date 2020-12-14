@@ -1,0 +1,21 @@
+---
+# https://eid.belgium.be/nl/linux-eid-software-installatie
+# https://peterlinux.blogspot.com/2019/06/eid-instaleren-op-ubuntu-1804.html
+# https://askubuntu.com/questions/571850/how-to-setup-belgian-eid-ubuntu-14-04
+- name: Setup eID-archive
+  become: yes
+  apt: 
+    deb: "{{ eid_deb_url }}"
+    update_cache: yes
+    cache_valid_time: 3600  # One hour
+
+- name: Install eID software
+  become: yes
+  apt: 
+    name: "{{ packages }}"
+    state: latest
+    update_cache: yes
+  vars:
+    packages:
+    - eid-viewer
+    - eid-mw

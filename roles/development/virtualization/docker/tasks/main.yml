@@ -1,0 +1,100 @@
+---
+# https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+# https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04
+# Setup
+- name: apt update
+  become: yes
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600  # One hour
+
+# https://docs.docker.com/engine/install/ubuntu/#uninstall-old-versions
+- name: Uninstall old versions
+  become: yes
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - docker
+    - docker-engine
+    - docker.io
+    - containerd
+    - runc
+
+- name: Install dependencies
+  become: yes
+  apt: 
+    name: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg-agent
+    - software-properties-common
+- name: Add Docker’s official GPG key
+  become: yes
+  apt_key: 
+    url: "{{ docker_gpg_key_url }}"
+    id: "{{ docker_gpg_key_fingerprint }}"
+    state: present
+
+- shell: "google-chrome --version"
+  register: chrome_version
+
+# `ansible_distribution_release` is the ansible fact for `lsb_release -cs`
+- name: Add Docker repo
+  become: yes
+  apt_repository:
+    repo: "deb [arch=amd64] {{ docker_repo_url }} {{ ansible_distribution_release}} stable"
+    state: present 
+
+- shell: "apt-cache policy docker-ce"
+  register: apt_cache_policy_docker
+- debug:
+    msg: "Docker repo to install:\n{{ apt_cache_policy_docker.stdout }}"
+
+# Install
+- name: Install Docker
+  become: yes
+  apt: 
+    name: "{{ packages }}"
+    state: latest
+    update_cache: yes
+  vars:
+    packages:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+
+# https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user
+# NOTE: we can't activate the group with `newgrp docker` in a local anisble session
+# Alternatively `meta: reset_connection` also won't work on a local connection
+- name: Create "Docker" group
+  become: yes
+  group:
+    name: "{{ docker_group }}"
+    state: present
+- name: Add user to Docker group
+  become: yes
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: "{{ docker_group }}"
+    append: yes
+- name: Activate changes to group
+  become: yes
+  shell: "newgrp {{ docker_group }}"
+   
+- shell: "docker --version"
+  register: docker_version
+- debug:
+    msg: "Docker version is {{ docker_version.stdout }}"
+
+# https://docs.docker.com/engine/install/linux-postinstall/#configure-docker-to-start-on-boot
+- name: Configure Docker to start on boot
+  service:
+    name: docker
+    state: started
+    enabled: true

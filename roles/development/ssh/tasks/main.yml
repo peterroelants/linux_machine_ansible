@@ -1,0 +1,17 @@
+---
+# Setup
+- name: Resolve ssh_key_file paht
+  set_fact:
+    user_ssh_key_file_resolved: "{{ user_ssh_key_file | expandvars | expanduser | realpath }}"
+
+# https://www.codesandnotes.be/2020/01/13/generate-ssh-keys-using-ansible/
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-2
+- name: Generate SSH key
+  user:
+    name: "{{ ansible_user_id }}"
+    generate_ssh_key: yes
+    ssh_key_type: rsa
+    ssh_key_bits: 4096
+    ssh_key_file: "{{ user_ssh_key_file_resolved }}"
+    state: present
+    force: no

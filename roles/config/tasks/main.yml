@@ -1,0 +1,22 @@
+---
+- name: Resolve `~/dotfiles`
+  set_fact:
+    dotfiles_path: "{{ '~/dotfiles' | expanduser }}"
+- name: Check if dotfiles already exits
+  stat: 
+    path: "{{ dotfiles_path }}"
+  register: dotfiles_path_stat
+- name: Print dotfiles path
+  debug:
+    msg: "Dotfiles directory: {{ dotfiles_path }}"
+
+- name: Setup configuration from dotfiles
+  block:
+  # https://github.com/peterroelants/dotfiles
+  - name: Checkout dotfiles
+    git:
+      repo: git@github.com:peterroelants/dotfiles.git
+      dest: "{{ dotfiles_path }}"
+  - name: Setup dotfiles
+    shell: "{{ dotfiles_path }}/setup.sh"
+  when: dotfiles_path_stat.stat.exists == false

@@ -1,0 +1,45 @@
+---
+- name: apt update
+  become: yes
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600  # One hour
+
+
+- name: Setup Chrome repository and install
+  block:
+
+  - name: Add Google Chrome key
+    become: yes
+    apt_key: 
+      url: "{{ google_linux_signing_key }}"
+      state: present
+
+  # Install for 64 bit architecture
+  # Figure out system architecture with `dpkg --print-architecture`
+  - name: Add Google Chrome repo
+    become: yes
+    apt_repository:
+      repo: "deb [arch=amd64] {{ google_chrome_repo }} stable main"
+      filename: google-chrome
+      state: present
+
+  - name: Install Google Chrome
+    become: yes
+    apt: 
+      name: google-chrome-stable
+      state: latest
+      update_cache: yes
+
+  - shell: "google-chrome --version"
+    register: chrome_version
+  - debug:
+      msg: "Chrome version is {{ chrome_version.stdout }}"
+
+
+# https://extensions.gnome.org/
+- name: Install Chrome Gnome shell
+  become: yes
+  apt: 
+    name: chrome-gnome-shell
+    state: latest

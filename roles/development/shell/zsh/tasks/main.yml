@@ -1,0 +1,51 @@
+---
+- name: Update apt cache
+  become: yes
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600  # One hour
+
+- name: Install dependencies
+  become: yes
+  apt: 
+    name: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+    - curl
+    - git
+
+- name: Install ZSH
+  become: yes
+  apt: 
+    name: zsh
+    state: latest
+
+- shell: zsh --version
+  register: zsh_version
+- debug:
+    msg: "ZSH version is {{ zsh_version.stdout }}"
+
+- shell: which zsh
+  register: which_zsh
+- debug:
+    msg: "{{ which_zsh.stdout }}"
+
+- name: Set ZSH as default shell
+  user:
+    name: "{{ ansible_user_id }}"
+    shell: "{{ which_zsh.stdout }}"
+
+# Oh My Zsh: https://github.com/ohmyzsh/ohmyzsh
+# Run unattended: https://github.com/ohmyzsh/ohmyzsh#unattended-install
+- name: Install Oh My Zsh  
+  shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  args:
+    creates: "{{ '~/.oh-my-zsh' | expanduser }}"
+
+# https://github.com/ohmyzsh/ohmyzsh#3-create-a-new-zsh-configuration-file
+- name: Default .zshrc file if not exists
+  copy:
+    src: "{{ zshrc_template | expandvars | expanduser | realpath }}"
+    dest: "{{ zshrc_file | expandvars | expanduser | realpath }}"
+    force: no  # Don't replace if exists

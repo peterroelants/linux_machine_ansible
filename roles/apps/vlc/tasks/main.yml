@@ -1,0 +1,16 @@
+---
+# Setup depencencies
+- name: Enable snap
+  become: yes
+  apt:
+    name: snapd
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600  # One hour
+
+# Install VLC via snap
+# https://www.videolan.org/vlc/download-ubuntu.html
+- name: Install VLC
+  become: yes
+  community.general.snap:
+    name: vlc

@@ -1,0 +1,15 @@
+---
+- name: Install powerline fonts
+  become: yes
+  apt: 
+    name: fonts-powerline
+    update_cache: yes
+    cache_valid_time: 3600  # One hour
+
+- name: Download NerdFonts
+  become: yes
+  get_url:
+    url: "{{ item }}"
+    dest: "{{ ubuntu_font_dir }}"
+    mode: "a+r"
+  loop: "{{ font_urls }}"

@@ -1,0 +1,13 @@
+---
+- name: Install Ruby
+  become: yes
+  apt: 
+    name: "{{ packages }}"
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600  # One hour
+  vars:
+    packages:
+    - ruby-full
+    - build-essential
+    - zlib1g-dev

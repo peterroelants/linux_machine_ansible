@@ -1,0 +1,69 @@
+---
+# Setup
+# NOTE: Requires `conda_path` variable to be defined
+- name: Resolve `conda_path`
+  set_fact:
+    conda_path_resolved: "{{ conda_path | expandvars | expanduser | realpath }}"
+- name: Print Miniconda Path
+  debug:
+    msg: "Installing Miniconda in {{ conda_path_resolved }}"
+
+- name: Check if conda path exists
+  stat: 
+    path: "{{ conda_path_resolved }}"
+  register: conda_path_stat
+
+# Install
+# https://docs.anaconda.com/anaconda/install/linux/
+# https://docs.anaconda.com/anaconda/install/silent-mode/#linux-macos
+- name: Install Miniconda
+  block:
+  - name: Download Miniconda
+    get_url:
+      url: "{{ miniconda_installer_url }}"
+      dest: "{{ miniconda_installer_tmp }}"
+      checksum: "sha256:{{ miniconda_installer_sha256 }}"
+      mode: "a+rx"
+  - name: Create conda folder
+    file:
+      path: "{{ conda_path_resolved }}"
+      state: directory
+      recurse: yes
+  - name: Run the installer
+    shell: "{{ miniconda_installer_tmp }} -b -u -p {{ conda_path_resolved }}"
+  when: conda_path_stat.stat.exists == false
+
+- name: Check conda binary version
+  block:
+  - name: Set conda binary
+    set_fact:
+      conda_binary: "{{ conda_path_resolved + '/bin/conda'}}"
+  - name: Print conda binary path
+    debug:
+      msg: "Conda binary is at {{ conda_binary }}"
+  - shell: "{{ conda_binary }} --version"
+    register: conda_version
+  - name: Print conda version
+    debug:
+      msg: "Conda version is {{ conda_version.stdout }}"
+
+# This will initialise conda for the user.
+# Alternatively if conda is installed for all users it can be initialised for
+#  all users by symlinking to profile.d: https://askubuntu.com/a/1080052/855813
+# Do not activate for now because it is set in the dotfiles
+# - name: Initialise conda
+#   shell: "{{ conda_binary }} init"
+
+# Don't auto activate base conda environment.
+# This keeps the default system Python
+- name: Disable auto activate
+  shell: "{{ conda_binary }} config --set auto_activate_base false"
+
+- name: Update conda
+  shell: "{{ conda_binary }} update conda"
+
+# Cleanup
+- name: Remove the installer
+  file:
+    state: absent
+    path: "{{ miniconda_installer_tmp }}"

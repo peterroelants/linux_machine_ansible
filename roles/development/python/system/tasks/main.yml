@@ -1,0 +1,14 @@
+---
+- name: Install/Update Python3 and pip3
+  become: yes
+  apt: 
+    name: "{{ packages }}"
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600  # One hour
+  vars:
+    packages:
+    - python3
+    - python3-pip
+    - python3-dev
+    - python-is-python3  # symlinks /usr/bin/python to python3
