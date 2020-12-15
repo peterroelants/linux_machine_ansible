@@ -2,6 +2,7 @@
 
 This repo contains a proof-of-concept of how to configure machines with ansible. For now it can configure Peter's laptop. While I wouldn't recommend to run it on your machine out-of-the box it can be a template that can help you configure your machine with minimal changes. In the future, once we have to maintain multiple company machines, this can be used to standardise and maintain those machines.
 
+Disclaimer: Using ansible to configure machines starts making more sense when you have more machines to be configured.
 
 ## Ansible
 
@@ -16,17 +17,18 @@ Sources:
 
 ### Setup Ansible
 
-Install ansible:
+Install ansible >= 2.10 :
 Via Python:
 ```
 sudo apt update --yes
 sudo apt install --yes python3 python3-pip
 pip3 install ansible jinja2 --user
+export PATH=$PATH:$HOME/.local/bin
 ```
 
-or aptitude:
+Note that ansible can be install by aptitude, however at time of writing (2020-12-15) this will install version 2.9, and this repo needs 2.10
 ```
-sudo apt update && sudo apt install ansible
+sudo apt install ansible
 ```
 
 ## Run this repo
@@ -44,6 +46,8 @@ ansible-playbook -verbose -i inventory local_peter.yml -c local --ask-become-pas
 
 Here the [`ansible-playbook`](https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html) command will run `local_peter.yml` with a local connection to the localhost defined in `./inventory`.
 `--ask-become-pass` is used to get the sudo password for when downstream setup scripts need this.
+
+NOTE: If you have a git repo that is accessible it should also be possible to run ansible and pull the git repo directly from a url.
 
 
 ### Pre-setup
@@ -96,3 +100,8 @@ More info at: https://itsfoss.com/update-firmware-ubuntu/
 - https://certification.ubuntu.com/hardware/202009-28224
 - https://download.lenovo.com/pccbbs/mobiles_pdf/tp_p1_gen2_ubuntu_18.04_lts_installation_v1.0.pdf
 - https://forums.lenovo.com/t5/ThinkPad-P-and-W-Series-Mobile-Workstations/P1-Gen-3-Linux-option/m-p/5034527
+
+
+## Run Log
+
+- 2020-12-15: Successfully run to configure Lenovo P1

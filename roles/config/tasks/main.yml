@@ -17,6 +17,7 @@
     git:
       repo: git@github.com:peterroelants/dotfiles.git
       dest: "{{ dotfiles_path }}"
+      accept_hostkey: yes
   - name: Setup dotfiles
     shell: "{{ dotfiles_path }}/setup.sh"
   when: dotfiles_path_stat.stat.exists == false

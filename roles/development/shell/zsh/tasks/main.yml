@@ -32,6 +32,7 @@
     msg: "{{ which_zsh.stdout }}"
 
 - name: Set ZSH as default shell
+  become: yes
   user:
     name: "{{ ansible_user_id }}"
     shell: "{{ which_zsh.stdout }}"

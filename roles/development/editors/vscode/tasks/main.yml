@@ -11,6 +11,7 @@
 # Install with snap
 # https://code.visualstudio.com/docs/setup/linux#_snap
 - name: Install VS Code
+  become: yes
   community.general.snap:
     name: code
     classic: yes
