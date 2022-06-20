@@ -14,7 +14,7 @@
   block:
   # https://github.com/peterroelants/dotfiles
   - name: Checkout dotfiles
-    git:
+    ansible.builtin.git:
       repo: git@github.com:peterroelants/dotfiles.git
       dest: "{{ dotfiles_path }}"
       accept_hostkey: yes

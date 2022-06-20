@@ -28,8 +28,8 @@
     - role: apps/slack
     - role: apps/eid_belgium
     - role: development/containers/docker
-    # - role: drivers/nvidia
-    # - role: config
+    - role: drivers/recommended
+    - role: config
 
   post_tasks:
     - debug:

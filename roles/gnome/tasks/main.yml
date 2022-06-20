@@ -10,5 +10,5 @@
     - dconf-cli
     - dconf-editor  # A GSettings editor for GNOME.
     - gnome-tweaks
-    - gnome-shell-extension-manager
-    - gnome-shell-extensions
+    #- gnome-shell-extension-manager
+    #- gnome-shell-extensions

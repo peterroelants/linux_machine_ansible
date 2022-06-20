@@ -41,7 +41,7 @@ Here the [`ansible-playbook`](https://docs.ansible.com/ansible/latest/cli/ansibl
 
 To run directly from the GitHub repository:
 ```
-ansible-pull \
+PYTHONUNBUFFERED=1 ansible-pull \
     --verbose \
     --url https://github.com/peterroelants/linux_machine_ansible \
     --inventory inventory \

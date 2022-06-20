@@ -1,0 +1,10 @@
+- name: Setup Check devices
+  shell: "ubuntu-drivers devices"
+  register: drivers_list
+
+- name: Print drivers
+  debug:
+    msg: "ubuntu-drivers devices:\n{{ drivers_list.stdout }}"
+
+- name: Install recommended drivers
+  shell: ubuntu-drivers autoinstall
