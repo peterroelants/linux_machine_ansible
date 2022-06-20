@@ -83,19 +83,18 @@
 # Alternatively `meta: reset_connection` also won't work on a local connection
 - name: Create "Docker" group
   become: true
-  group:
+  ansible.builtin.group:
     name: "{{ docker_group }}"
     state: present
 - name: Add user to Docker group
   become: true
-  user:
+  ansible.builtin.user:
     name: "{{ ansible_user_id }}"
     groups: "{{ docker_group }}"
-    append: yes
-- name: Activate changes to group
-  become: true
-  shell: "newgrp {{ docker_group }}"
-   
+    append: true
+- name: Reset connection so docker group is picked up.
+  meta: reset_connection
+
 - shell: "docker --version"
   register: docker_version
 - debug:
