@@ -1,0 +1,22 @@
+---
+# https://slack.com/help/articles/212924728-Download-Slack-for-Linux--beta-
+- name: Download and install Slack
+  block:
+
+  - name: Setup Slack archive
+    become: true
+    ansible.builtin.apt: 
+      deb: "{{ slack_deb_url }}"
+      update_cache: yes
+
+  - name: Install Slack
+    become: true
+    ansible.builtin.apt: 
+      name: slack-desktop
+      state: latest
+      update_cache: yes
+
+  - shell: "slack --version"
+    register: slack_version
+  - debug:
+      msg: "Slack version is {{ slack_version.stdout }}"

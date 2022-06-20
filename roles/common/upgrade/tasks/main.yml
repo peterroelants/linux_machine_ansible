@@ -1,6 +1,8 @@
 ---
-- name: apt update && apt full-upgrade
-  become: yes
-  apt:
+- name: apt update && apt full-upgrade && sudo apt autoremove && sudo apt autoclean
+  become: true
+  ansible.builtin.apt:
     upgrade: full
+    autoremove: true
+    autoclean: true
     update_cache: yes

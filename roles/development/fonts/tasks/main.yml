@@ -1,13 +1,13 @@
 ---
 - name: Install powerline fonts
-  become: yes
-  apt: 
+  become: true
+  ansible.builtin.apt: 
     name: fonts-powerline
     update_cache: yes
-    cache_valid_time: 3600  # One hour
 
+# https://github.com/ryanoasis/nerd-fonts
 - name: Download NerdFonts
-  become: yes
+  become: true
   get_url:
     url: "{{ item }}"
     dest: "{{ ubuntu_font_dir }}"

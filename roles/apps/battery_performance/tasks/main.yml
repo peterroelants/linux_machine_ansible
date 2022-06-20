@@ -1,0 +1,11 @@
+---
+- name: Install Battery Performance tools
+  become: true
+  ansible.builtin.apt: 
+    name: "{{ packages }}"
+    state: latest
+    update_cache: true
+  vars:
+    packages:
+    - acpi  # Batter status display
+    - laptop-mode-tools   # Tools for Power Savings based on battery/AC status

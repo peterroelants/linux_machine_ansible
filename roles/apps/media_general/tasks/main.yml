@@ -1,0 +1,15 @@
+---
+- name: Install General Media Tools
+  become: true
+  ansible.builtin.apt: 
+    name: "{{ packages }}"
+    state: latest
+    update_cache: true
+  vars:
+    packages:
+    - ffmpeg
+    - gpick  # Color picker
+    - mplayer  # Movie player
+    - nomacs  # Image viewer https://nomacs.org/
+    - peek  # Gif screen recorder https://github.com/phw/peek
+    - pinta  # Drawing tool https://www.pinta-project.com/

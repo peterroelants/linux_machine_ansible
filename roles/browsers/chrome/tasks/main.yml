@@ -1,32 +1,30 @@
 ---
-- name: apt update
-  become: yes
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600  # One hour
-
-
+# https://support.google.com/chrome/a/answer/9025903?hl=en
 - name: Setup Chrome repository and install
   block:
 
-  - name: Add Google Chrome key
-    become: yes
-    apt_key: 
+  # https://stackoverflow.com/a/72548342/919431
+  # https://stackoverflow.com/a/71384057/919431
+  - name: Add Chrome GPG key
+    become: true
+    ansible.builtin.get_url:
       url: "{{ google_linux_signing_key }}"
-      state: present
+      dest: "{{ google_key_file_local }}"
+      mode: '0644'
+      force: true
 
   # Install for 64 bit architecture
   # Figure out system architecture with `dpkg --print-architecture`
   - name: Add Google Chrome repo
-    become: yes
-    apt_repository:
-      repo: "deb [arch=amd64] {{ google_chrome_repo }} stable main"
+    become: true
+    ansible.builtin.apt_repository:
+      repo: "deb [arch=amd64 signed-by={{ google_key_file_local }}] {{ google_chrome_repo }} stable main"
       filename: google-chrome
       state: present
 
   - name: Install Google Chrome
-    become: yes
-    apt: 
+    become: true
+    ansible.builtin.apt: 
       name: google-chrome-stable
       state: latest
       update_cache: yes
@@ -37,9 +35,46 @@
       msg: "Chrome version is {{ chrome_version.stdout }}"
 
 
+# https://support.google.com/chrome/a/answer/9027408?hl=en&ref_topic=9025817
+- name: Set Chrome policies
+  block:
+
+  - name: Create policy directory
+    become: true
+    file:
+      path: /etc/opt/chrome/policies
+      state: directory
+
+  - name: Create managed policy directory
+    become: true
+    file:
+      path: /etc/opt/chrome/policies/managed
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: Create recommended policy directory
+    become: true
+    file:
+      path: /etc/opt/chrome/policies/recommended
+      state: directory
+      owner: "{{ ansible_user_id }}"
+      group: "{{ ansible_user_id }}"
+      mode: 0755
+
+  - name: Set default config
+    become: true
+    copy:
+      src: "{{ role_path }}/files/recommended_policies.json"
+      dest: /etc/opt/chrome/policies/recommended/recommended_policies.json
+      owner: "{{ ansible_user_id }}"
+      group: "{{ ansible_user_id }}"
+
+
 # https://extensions.gnome.org/
 - name: Install Chrome Gnome shell
-  become: yes
+  become: true
   apt: 
     name: chrome-gnome-shell
     state: latest

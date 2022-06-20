@@ -1,41 +1,42 @@
 ---
-- name: apt update
-  become: yes
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600  # One hour
-
 - name: Install tools
-  become: yes
-  apt: 
+  become: true
+  ansible.builtin.apt: 
     name: "{{ packages }}"
     state: latest
+    update_cache: true
   vars:
     packages:
+    - apt-rdepends
     - build-essential
     - curl
+    - gpg
     - grep
     - htop
+    - jq  # https://stedolan.github.io/jq/
     - less
+    - meld  # https://meldmerge.org/development.html
     - openssh-client
     - wget
     - whois
 
 - name: Install compression tools
-  become: yes
-  apt: 
+  become: true
+  ansible.builtin.apt: 
     name: "{{ packages }}"
     state: latest
+    update_cache: true
   vars:
     packages:
     - gzip
     - tar
 
 - name: Install Git Tools
-  become: yes
-  apt: 
+  become: true
+  ansible.builtin.apt: 
     name: "{{ packages }}"
     state: latest
+    update_cache: true
   vars:
     packages:
     - git
@@ -46,7 +47,8 @@
 
 # https://snapcraft.io/docs/installing-snap-on-ubuntu
 - name: Enable snap
-  become: yes
-  apt:
+  become: true
+  ansible.builtin.apt:
     pkg: snapd
     state: latest
+    update_cache: true

@@ -8,9 +8,9 @@
     update_cache: yes
 
 # Install with snap
-# https://www.jetbrains.com/help/pycharm/installation-guide.html#snap-install
-- name: Install PyCharm
+# https://code.visualstudio.com/docs/setup/linux#_snap
+- name: Install VS Code
   become: true
   community.general.snap:
-    name: pycharm-community
+    name: code
     classic: yes

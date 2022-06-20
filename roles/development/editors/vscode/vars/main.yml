@@ -1,0 +1,3 @@
+microsoft_linux_signing_key: https://packages.microsoft.com/keys/microsoft.asc
+microsoft_key_file_local: /usr/share/keyrings/packages.microsoft.gpg_armored
+vscode_repo: https://packages.microsoft.com/repos/code

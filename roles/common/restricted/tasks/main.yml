@@ -1,17 +1,12 @@
 ---
-- name: apt update
-  become: yes
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600  # One hour
-
 # Install codecs and non-opensource packages
 # https://en.wikipedia.org/wiki/Ubuntu-restricted-extras
 - name: Install tools
-  become: yes
-  apt: 
+  become: true
+  ansible.builtin.apt: 
     name: "{{ packages }}"
     state: latest
+    update_cache: true
   vars:
     packages:
     - ubuntu-restricted-extras

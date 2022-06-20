@@ -1,25 +1,21 @@
 ---
-- name: Update apt cache
-  become: yes
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600  # One hour
-
 - name: Install dependencies
-  become: yes
-  apt: 
+  become: true
+  ansible.builtin.apt: 
     name: "{{ packages }}"
     state: latest
+    update_cache: yes
   vars:
     packages:
     - curl
     - git
 
 - name: Install ZSH
-  become: yes
-  apt: 
+  become: true
+  ansible.builtin.apt: 
     name: zsh
     state: latest
+    update_cache: yes
 
 - shell: zsh --version
   register: zsh_version
@@ -32,7 +28,7 @@
     msg: "{{ which_zsh.stdout }}"
 
 - name: Set ZSH as default shell
-  become: yes
+  become: true
   user:
     name: "{{ ansible_user_id }}"
     shell: "{{ which_zsh.stdout }}"

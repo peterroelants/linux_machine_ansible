@@ -1,29 +1,38 @@
 ---
 # https://www.spotify.com/us/download/linux/
-- name: apt update
-  become: yes
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600  # One hour
-
 - name: Setup Spotify repository and install
   block:
-  - name: Add Spotify key
-    become: yes
-    apt_key: 
+
+  # https://stackoverflow.com/a/72548342/919431
+  # https://stackoverflow.com/a/71384057/919431
+  - name: Add Spotify GPG key
+    become: true
+    ansible.builtin.get_url:
       url: "{{ spotify_sign_key }}"
-      state: present
+      dest: "{{ spotify_key_file_local }}"
+      mode: '0644'
+      force: true
+
+  - name: De-Armor Spotify GPG key
+    command:  "gpg --dearmor <{{ spotify_key_file_local }} > {{ spotify_key_file_local }}"
+    args:
+      creates: "{{ spotify_key_file_local }}"
 
   - name: Add Spotify repo
-    become: yes
-    apt_repository:
-      repo: "deb {{ spotify_repo_url }} stable non-free"
+    become: true
+    ansible.builtin.apt_repository:
+      repo: "deb [arch=amd64 signed-by={{ spotify_key_file_local }}] {{ spotify_repo_url }} stable non-free"
       filename: spotify
       state: present
 
   - name: Install Spotify
-    become: yes
-    apt: 
+    become: true
+    ansible.builtin.apt: 
       name: spotify-client
       state: latest
       update_cache: yes
+
+  - shell: "spotify --version"
+    register: spotify_version
+  - debug:
+      msg: "Spotify version is {{ spotify_version.stdout }}"

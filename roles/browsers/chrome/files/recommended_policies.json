@@ -1,0 +1,18 @@
+{
+    "homepage": "http://www.google.com",
+    "homepage_is_newtabpage": false,
+    "browser": {
+      "show_home_button": true
+    },
+    "RegisteredProtocolHandlers": {
+        "error": "Policy level is not supported.",
+        "level": "mandatory",
+        "scope": "machine",
+        "source": "platform",
+        "value": [ {
+            "default": true,
+            "protocol": "mailto",
+            "url": "https://mail.google.com/mail/?extsrc=mailto&url=%s"
+        } ]
+    }
+}

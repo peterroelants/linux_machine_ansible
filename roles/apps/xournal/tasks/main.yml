@@ -7,9 +7,9 @@
     state: latest
     update_cache: yes
 
-# Install VLC via snap
-# https://www.videolan.org/vlc/download-ubuntu.html
-- name: Install VLC
+# Install Xournal++ via snap
+# https://snapcraft.io/install/xournalpp/ubuntu
+- name: Install Xournal++
   become: true
   community.general.snap:
-    name: vlc
+    name: xournalpp

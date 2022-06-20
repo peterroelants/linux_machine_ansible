@@ -1,0 +1,64 @@
+---
+# Setup
+# NOTE: Requires `mamba_path` variable to be defined
+- name: Resolve `mamba_path`
+  set_fact:
+    mamba_path_resolved: "{{ mamba_path | expandvars | expanduser | realpath }}"
+- name: Print Mamba Path
+  debug:
+    msg: "Installing Mamba in {{ mamba_path_resolved }}"
+
+- name: Check if mamba path exists
+  stat: 
+    path: "{{ mamba_path_resolved }}"
+  register: mamba_path_stat
+
+
+# Install
+# https://github.com/conda-forge/miniforge
+- name: Install Mamba
+  block:
+
+  - name: Download Mambaforge
+    get_url:
+      url: "{{ mambaforge_installer_url }}"
+      dest: "{{ mambaforge_installer_tmp }}"
+      mode: "a+rx"
+
+  - name: Run Mamba installer
+    shell: "bash {{ mambaforge_installer_tmp }} -b -p {{ mamba_path_resolved }}"
+  when: mamba_path_stat.stat.exists == false
+
+
+- name: Check Mamba binary version
+  block:
+
+  - name: Set Mamba binary
+    set_fact:
+      mamba_binary: "{{ mamba_path_resolved + '/bin/mamba'}}"
+
+  - name: Print Mamba binary path
+    debug:
+      msg: "Mamba binary is at {{ mamba_binary }}"
+
+  - shell: "{{ mamba_binary }} --version"
+    register: mamba_version
+
+  - name: Print Mamba version
+    debug:
+      msg: "Mamba version is {{ mamba_version.stdout }}"
+
+# This will initialise mamba for the user.
+# Don't auto activate base mamba environment.
+# This keeps the default system Python
+- name: Disable auto activate
+  shell: "{{ mamba_binary }} config --set auto_activate_base false"
+
+- name: Update Mamba and Conda
+  shell: "{{ mamba_binary }} update --yes mamba conda"
+
+# Cleanup
+- name: Remove the installer
+  file:
+    state: absent
+    path: "{{ mambaforge_installer_tmp }}"

@@ -1,17 +1,9 @@
 ---
-# Setup depencencies
-- name: Enable snap
-  become: yes
-  apt:
-    name: snapd
-    state: latest
-    update_cache: yes
-    cache_valid_time: 3600  # One hour
-
 # Install with apt
 # https://www.gimp.org/downloads/
 - name: Install GIMP
-  become: yes
-  apt:
+  become: true
+  ansible.builtin.apt:
     name: gimp
     state: latest
+    update_cache: true

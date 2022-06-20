@@ -1,6 +1,6 @@
 # Configure laptop with ansible
 
-This repo contains a proof-of-concept of how to configure machines with ansible. For now it can configure Peter's laptop. While I wouldn't recommend to run it on your machine out-of-the box it can be a template that can help you configure your machine with minimal changes. In the future, once we have to maintain multiple company machines, this can be used to standardise and maintain those machines.
+This repo contains a proof-of-concept of how to configure machines with ansible. For now it can configure my local laptop. While I wouldn't recommend to run it on your machine out-of-the box it can be a template that can help you configure your machine with minimal changes. In the future, once we have to maintain multiple company machines, this can be used to standardise and maintain those machines.
 
 Disclaimer: Using ansible to configure machines starts making more sense when you have more machines to be configured.
 
@@ -18,15 +18,6 @@ Sources:
 ### Setup Ansible
 
 Install ansible >= 2.10 :
-Via Python:
-```
-sudo apt update --yes
-sudo apt install --yes python3 python3-pip
-pip3 install ansible jinja2 --user
-export PATH=$PATH:$HOME/.local/bin
-```
-
-Note that ansible can be install by aptitude, however at time of writing (2020-12-15) this will install version 2.9, and this repo needs 2.10
 ```
 sudo apt install ansible
 ```
@@ -35,20 +26,28 @@ sudo apt install ansible
 
 This repo is intentend to run on the local host without a remote connection, as is defined in the `./inventory` file.
 
-The different [roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html) in `./roles` define how to setup various apps and configs. These are selected an run by the `./local_peter.yml` [playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html) that can be used to configure Peter's laptop.
+The different [roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html) in `./roles` define how to setup various apps and configs. These are selected an run by the `./local_laptop.yml` [playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html) that can be used to configure my local laptop.
 
 
 ### Run The Ansible Playbook
-Run `local_peter.yml` on Peter's freshly installed ubuntu laptop to set it up:
+Run `local_laptop.yml` on my local freshly installed ubuntu laptop to set it up:
 ```
-ansible-playbook -verbose -i inventory local_peter.yml -c local --ask-become-pass
+ansible-playbook --verbose -i inventory local_laptop.yml -c local --ask-become-pass
 ```
 
-Here the [`ansible-playbook`](https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html) command will run `local_peter.yml` with a local connection to the localhost defined in `./inventory`.
+Here the [`ansible-playbook`](https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html) command will run `local_laptop.yml` with a local connection to the localhost defined in `./inventory`.
 `--ask-become-pass` is used to get the sudo password for when downstream setup scripts need this.
 
-NOTE: If you have a git repo that is accessible it should also be possible to run ansible and pull the git repo directly from a url.
 
+To run directly from the GitHub repository:
+```
+ansible-pull \
+    --verbose \
+    --url https://github.com/peterroelants/linux_machine_ansible \
+    --inventory inventory \
+    --ask-become-pass \
+    local_laptop.yml
+```
 
 ### Pre-setup
 

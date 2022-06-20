@@ -1,7 +1,8 @@
 ---
-- name: Install Neovim
+# Setup dependencies
+- name: Install Libre Office
   become: true
   ansible.builtin.apt:
-    name: neovim
+    name: libreoffice
     state: latest
     update_cache: yes

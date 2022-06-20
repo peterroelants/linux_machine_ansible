@@ -1,0 +1,109 @@
+---
+# https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+# https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04
+# Setup
+
+
+# https://docs.docker.com/engine/install/ubuntu/#uninstall-old-versions
+- name: Uninstall old versions of Docker
+  become: true
+  ansible.builtin.apt:
+    name: "{{ packages }}"
+    state: absent
+    update_cache: yes
+  vars:
+    packages:
+    - docker
+    - docker-engine
+    - docker.io
+    - containerd
+    - runc
+
+- name: Install dependencies
+  become: true
+  ansible.builtin.apt: 
+    name: "{{ packages }}"
+    state: latest
+    update_cache: yes
+  vars:
+    packages:
+    - ca-certificates
+    - gpg
+
+
+# https://code.visualstudio.com/docs/setup/linux
+- name: Setup Docker repository and install
+  block:
+
+  # https://stackoverflow.com/a/72548342/919431
+  # https://stackoverflow.com/a/71384057/919431
+  - name: Add Docker GPG key
+    become: true
+    ansible.builtin.get_url:
+      url: "{{ docker_gpg_key_url }}"
+      dest: "{{ docker_key_file_local }}"
+      mode: '0644'
+      force: true
+
+  - name: De-Armor Docker GPG key
+    become: true
+    command:  "gpg --dearmor < {{ docker_key_file_local }} > {{ docker_key_file_local }}"
+    args:
+      creates: "{{ docker_key_file_local }}"
+
+  # `ansible_distribution_release` is the ansible fact for `lsb_release -cs`
+  - name: Add Docker repo
+    become: true
+    ansible.builtin.apt_repository:
+      repo: "deb [arch=amd64 signed-by={{ docker_key_file_local }}] {{ docker_repo_url }} {{ ansible_distribution_release }} stable"
+      filename: docker
+      state: present 
+
+  - shell: "apt-cache policy docker-ce"
+    register: apt_cache_policy_docker
+  - debug:
+      msg: "Docker repo to install:\n{{ apt_cache_policy_docker.stdout }}"
+
+  # Install
+  - name: Install Docker
+    become: true
+    ansible.builtin.apt: 
+      name: "{{ packages }}"
+      state: latest
+      update_cache: yes
+    vars:
+      packages:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+
+# https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user
+# NOTE: we can't activate the group with `newgrp docker` in a local anisble session
+# Alternatively `meta: reset_connection` also won't work on a local connection
+- name: Create "Docker" group
+  become: true
+  group:
+    name: "{{ docker_group }}"
+    state: present
+- name: Add user to Docker group
+  become: true
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: "{{ docker_group }}"
+    append: yes
+- name: Activate changes to group
+  become: true
+  shell: "newgrp {{ docker_group }}"
+   
+- shell: "docker --version"
+  register: docker_version
+- debug:
+    msg: "Docker version is {{ docker_version.stdout }}"
+
+# https://docs.docker.com/engine/install/linux-postinstall/#configure-docker-to-start-on-boot
+- name: Configure Docker to start on boot
+  service:
+    name: docker
+    state: started
+    enabled: true

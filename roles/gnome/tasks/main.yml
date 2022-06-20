@@ -1,8 +1,14 @@
 ---
-- name: Install Gnome Tweaks
-  become: yes
-  apt:
-    name: gnome-tweaks
+- name: Install Gnome Utilities
+  become: true
+  ansible.builtin.apt: 
+    name: "{{ packages }}"
     state: latest
     update_cache: yes
-    cache_valid_time: 3600  # One hour
+  vars:
+    packages:
+    - dconf-cli
+    - dconf-editor  # A GSettings editor for GNOME.
+    - gnome-tweaks
+    - gnome-shell-extension-manager
+    - gnome-shell-extensions

@@ -1,17 +1,48 @@
 ---
-# Setup depencencies
-- name: Enable snap
-  become: yes
-  apt:
-    pkg: snapd
-    state: latest
+- name: Install dependencies (apt)
+  become: true
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - apt-transport-https
+      - gpg
+    state: present
     update_cache: yes
-    cache_valid_time: 3600  # One hour
 
-# Install with snap
-# https://code.visualstudio.com/docs/setup/linux#_snap
-- name: Install VS Code
-  become: yes
-  community.general.snap:
-    name: code
-    classic: yes
+# https://code.visualstudio.com/docs/setup/linux
+- name: Setup VSCode repository and install
+  block:
+
+  # https://stackoverflow.com/a/72548342/919431
+  # https://stackoverflow.com/a/71384057/919431
+  - name: Add Microsoft GPG key
+    become: true
+    ansible.builtin.get_url:
+      url: "{{ microsoft_linux_signing_key }}"
+      dest: "{{ microsoft_key_file_local }}"
+      mode: '0644'
+      force: true
+
+  - name: De-Armor Microsoft GPG key
+    command:  "gpg --dearmor <{{ microsoft_key_file_local }} > {{ microsoft_key_file_local }}"
+    args:
+      creates: "{{ microsoft_key_file_local }}"
+
+  - name: Add VSCode repo
+    become: true
+    ansible.builtin.apt_repository:
+      repo: "deb [arch=amd64 signed-by={{ microsoft_key_file_local }}] {{ vscode_repo }} stable main"
+      filename: vscode
+      state: present
+
+  - name: Install VSCode
+    become: true
+    ansible.builtin.apt: 
+      name: code
+      state: latest
+      update_cache: yes
+
+  - shell: "code --version"
+    register: vscode_version
+  - debug:
+      msg: "VSCode version is {{ vscode_version.stdout }}"

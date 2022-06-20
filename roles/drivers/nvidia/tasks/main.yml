@@ -1,26 +1,20 @@
 ---
-- name: apt update.
-  become: true
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600  # One hour
-
 - name: Add Nvidia repository.
-  become: yes
-  apt_repository:
+  become: true
+  ansible.builtin.apt_repository:
     repo: ppa:graphics-drivers
     state: present 
 
 - name: Install the Nvidia driver.
-  become: yes
-  apt: 
+  become: true
+  ansible.builtin.apt: 
     name: "{{ nvidia_driver }}"
     state: latest
     update_cache: yes
 
 - name: Install CUDA
-  become: yes
-  apt: 
+  become: true
+  ansible.builtin.apt: 
     name: nvidia-cuda-toolkit
     state: latest
     update_cache: yes

@@ -1,11 +1,10 @@
 ---
 - name: Install/Update Python3 and pip3
-  become: yes
-  apt: 
+  become: true
+  ansible.builtin.apt: 
     name: "{{ packages }}"
     state: latest
     update_cache: yes
-    cache_valid_time: 3600  # One hour
   vars:
     packages:
     - python3

@@ -1,3 +1,4 @@
 apt_file: /etc/apt/sources.list.d/google-chrome.list
 google_linux_signing_key: https://dl-ssl.google.com/linux/linux_signing_key.pub
+google_key_file_local: /usr/share/keyrings/google.gpg_armored
 google_chrome_repo: http://dl.google.com/linux/chrome/deb/
